@@ -1,23 +1,45 @@
 /* eslint-disable prettier/prettier */
-import { BeforeInsert, Column, CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 export abstract class BaseEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
-    @CreateDateColumn()
-    createAt: Date;
-    @UpdateDateColumn()
-    updateAt: Date;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+  @CreateDateColumn()
+  createAt: Date;
+  @UpdateDateColumn()
+  updateAt: Date;
 
-    @Column({default: false})
-    isDelete: boolean;
-    
-    @DeleteDateColumn()
-    deleteAt?:Date;
+  @Column({ default: false })
+  isDelete: boolean;
 
-    @BeforeInsert()
-    generate(){
-        this.id = uuid();
-    }
+  @DeleteDateColumn()
+  deleteAt?: Date;
+
+  @BeforeInsert()
+  generate() {
+    this.id = uuid();
+  }
+
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updateAt = new Date();
+  }
+  toJSON() {
+    return {
+      ...this,
+      updateAt: undefined,
+      isDelete: undefined,
+      deleteAt: undefined,
+      password: undefined,
+    };
+  }
 }

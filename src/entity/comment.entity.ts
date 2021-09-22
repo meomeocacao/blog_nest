@@ -2,7 +2,7 @@
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { Post } from './post.entity';
+import { PostEntity } from './post.entity';
 
 @Entity()
 export class Comment extends BaseEntity {
@@ -17,6 +17,6 @@ export class Comment extends BaseEntity {
   @Column({default: false})
   published: boolean;
 
-  @ManyToOne(()=> Post, post => post.comments)
-  post: Post;
+  @ManyToOne(()=> PostEntity, post => post.comments)
+  post: PostEntity;
 }

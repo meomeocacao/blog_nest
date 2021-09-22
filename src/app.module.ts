@@ -9,7 +9,7 @@ import { CategoryModule } from './category/category.module';
 import { User } from './entity/user.entity';
 import { Comment } from './entity/comment.entity';
 import { ImgPost } from './entity/imgpost.entity';
-import { Post } from './entity/post.entity';
+import { PostEntity } from './entity/post.entity';
 import { Tag } from './entity/tag.entity';
 import { Category } from './entity/category.entity';
 import { AuthModule } from './auth/auth.module';
@@ -24,8 +24,8 @@ import { AuthModule } from './auth/auth.module';
       password: '123123',
       database: 'blog_nest',
       // autoLoadEntities: true,
-      entities: [User, Comment, ImgPost, Post, Tag, Category],
-      // entities: ['./entity/**.entity.ts'],
+      // entities: [User, Comment, ImgPost, PostEntity, Tag, Category],
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     UserModule,

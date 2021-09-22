@@ -20,16 +20,24 @@ export class UserService {
     private userRepository: UserRepository,
   ) {}
   //   get user by filter
-  async getUser(userFilterDto: UserFilterDTO): Promise<User[]> {
-    return await this.userRepository.getUser(userFilterDto);
+  // async getUser(userFilterDto: UserFilterDTO): Promise<User[]> {
+  //   return await this.userRepository.getUser(userFilterDto);
+  // }
+  async getUser(): Promise<User[]> {
+    return await this.userRepository.find({
+      where: { isDelete: false },
+      relations: ['posts'],
+      withDeleted: false,
+    });
   }
   //   get User by Id
   async getUserById(id: string): Promise<User> {
     const found = await this.userRepository.findOne({
+      select: ['password'],
       where: {
         id: id,
       },
-      //   relations: ['post'],
+      relations: ['posts'],
     });
     if (!found) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -39,14 +47,9 @@ export class UserService {
   //   get User by any
   async getUserByAny(value: string): Promise<User> {
     const found = await this.userRepository.findOne({
-      where: [
-        {
-          id: value,
-        },
-        { username: value },
-        { email: value },
-      ],
-      //   relations: ['post'],
+      where: [{ id: value }, { username: value }, { email: value }],
+      relations: ['posts'],
+      withDeleted: true,
     });
     if (!found) {
       throw new NotFoundException(`User with ${value} not found`);
@@ -72,8 +75,6 @@ export class UserService {
     // hash
     const salt = await bcrypt.genSalt();
     createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
-    console.log(createUserDto.password);
-
     return await this.userRepository.createUser(createUserDto);
   }
 

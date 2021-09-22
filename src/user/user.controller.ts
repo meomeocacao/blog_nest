@@ -21,9 +21,13 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   // GET /user
+  // @Get()
+  // getUser(@Query() filterDto: UserFilterDTO): Promise<User[]> {
+  //   return this.userService.getUser(filterDto);
+  // }
   @Get()
   getUser(@Query() filterDto: UserFilterDTO): Promise<User[]> {
-    return this.userService.getUser(filterDto);
+    return this.userService.getUser();
   }
 
   // GET /user/:id

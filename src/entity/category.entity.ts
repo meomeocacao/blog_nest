@@ -2,7 +2,7 @@
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { Column, Entity, ManyToMany, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { Post } from './post.entity';
+import { PostEntity } from './post.entity';
 
 @Entity()
 export class Category extends BaseEntity {
@@ -14,6 +14,6 @@ export class Category extends BaseEntity {
   @Column()
   content: string;
 
-  @ManyToMany(()=> Post, post => post.categories)
-  posts: Post[];
+  @ManyToMany(()=> PostEntity, post => post.categories,{cascade: true})
+  posts: PostEntity[];
 }

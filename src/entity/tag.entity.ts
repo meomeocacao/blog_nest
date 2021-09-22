@@ -2,7 +2,7 @@
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { Column, Entity, ManyToMany, ManyToOne, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { Post } from './post.entity';
+import { PostEntity } from './post.entity';
 
 @Entity()
 export class Tag extends BaseEntity {
@@ -17,6 +17,8 @@ export class Tag extends BaseEntity {
   @Column({ default: false })
   published: boolean;
 
-  @ManyToMany(()=> Post, post => post.tags)
-  posts: Post[];
+  @ManyToMany(() => PostEntity, (post) => post.tags, {
+    cascade: true,
+  })
+  posts: PostEntity[];
 }

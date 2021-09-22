@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty } from 'class-validator';
+import { PostDTO } from 'src/post/postDto/post.DTO';
 import {
   Column,
   Entity,
@@ -17,7 +18,7 @@ import { Tag } from './tag.entity';
 import { User } from './user.entity';
 
 @Entity()
-export class Post extends BaseEntity {
+export class PostEntity extends BaseEntity {
   @PrimaryColumn()
   @IsNotEmpty()
   title: string;
@@ -35,11 +36,11 @@ export class Post extends BaseEntity {
   @ManyToOne(() => User, (user) => user.posts)
   user: User;
 
-  @ManyToMany(() => Tag, (tag) => tag.posts, { cascade: true })
+  @ManyToMany(() => Tag, (tag) => tag.posts, )
   @JoinTable()
   tags: Tag[];
 
-  @ManyToMany(() => Category, (category) => category.posts, { cascade: true })
+  @ManyToMany(() => Category, (category) => category.posts,)
   @JoinTable()
   categories: Category[];
 

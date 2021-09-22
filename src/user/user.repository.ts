@@ -8,22 +8,22 @@ import {
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-  async getUser(userFilterDto: UserFilterDTO): Promise<User[]> {
-    const { firstname, lastname } = userFilterDto;
+  // async getUser(userFilterDto: UserFilterDTO): Promise<User[]> {
+  //   const { firstname, lastname } = userFilterDto;
 
-    const query = this.createQueryBuilder('user');
+  //   const query = this.createQueryBuilder('user');
 
-    if (firstname) {
-      query.andWhere('user.firstname =:firstname', { firstname: firstname });
-    }
-    if(lastname){
-        query.andWhere(
-            'LOWER(user.lastname) LIKE LOWER(:lastname) OR LOWER(user.firstname) LIKE LOWER(:lastname', { lastname: `%${lastname}%` }
-            );
-    }
-    const users = await query.getMany();
-    return users;
-  }
+  //   if (firstname) {
+  //     query.andWhere('user.firstname =:firstname', { firstname: firstname });
+  //   }
+  //   if(lastname){
+  //       query.andWhere(
+  //           'LOWER(user.lastname) LIKE LOWER(:lastname) OR LOWER(user.firstname) LIKE LOWER(:lastname', { lastname: `%${lastname}%` }
+  //           );
+  //   }
+  //   const users = await query.getMany();
+  //   return users;
+  // }
 
   async createUser(createUserDto: CreateUserDTO): Promise<User> {
     const { username, email, password, firstname, lastname, profile } = createUserDto;
