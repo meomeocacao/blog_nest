@@ -6,3 +6,9 @@ export class CommentDTO {
   @IsNotEmpty()
   content: string;
 }
+
+export class UpdateCommentDTO {
+  title: string;
+  @IsNotEmpty()
+  content: string;
+}

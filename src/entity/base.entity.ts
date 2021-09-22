@@ -33,13 +33,13 @@ export abstract class BaseEntity {
   updateTimestamp() {
     this.updateAt = new Date();
   }
-  toJSON() {
-    return {
-      ...this,
-      updateAt: undefined,
-      isDelete: undefined,
-      deleteAt: undefined,
-      password: undefined,
-    };
-  }
+//   toJSON() {
+//     return {
+//       ...this,
+//       updateAt: undefined,
+//       isDelete: undefined,
+//       deleteAt: undefined,
+//       password: undefined,
+//     };
+//   }
 }

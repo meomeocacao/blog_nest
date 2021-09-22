@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/entity/comment.entity';
+import { ImgPost } from 'src/entity/imgpost.entity';
 import { PostEntity } from 'src/entity/post.entity';
 import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 import { PostRepository } from './post.repository';
-import { CommentDTO } from './postDto/comment.DTO';
+import { CommentDTO, UpdateCommentDTO } from './postDto/comment.DTO';
+import { ImgDTO } from './postDto/img.DTO';
 import { CreatePostDTO, UpdatePostDTO } from './postDto/post.DTO';
 
 @Injectable()
@@ -17,6 +19,8 @@ export class PostService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    @InjectRepository(ImgPost)
+    private readonly imgPostRepository: Repository<ImgPost>,
   ) {}
   //   get user by id/email/username
   async getUser(userId: string): Promise<User> {
@@ -100,6 +104,24 @@ export class PostService {
 
     return post;
   }
+  // update comment
+  async updateComment(
+    cmtId: string,
+    updateCmt: UpdateCommentDTO,
+  ): Promise<PostEntity> {
+    const comment = await this.commentRepository.findOne({
+      where: { id: cmtId },
+      relations: ['post'],
+    });
+    if (!comment)
+      throw new NotFoundException(`Comment with ID ${cmtId} not found `);
+    comment.title = updateCmt.title || comment.title;
+    comment.content = updateCmt.content;
+    // const updated = await this.commentRepository.findOne({ id: cmtId });
+    await this.commentRepository.save(comment);
+    return this.getPost(comment.post.id);
+  }
+
   // delete comment
   async delComment(postId: string, cmtId: string): Promise<PostEntity> {
     const post = await this.getPost(postId);
@@ -110,6 +132,14 @@ export class PostService {
       throw new NotFoundException(`Comment with ID ${cmtId} not found`);
     comment.isDelete = true;
     await this.postRepository.save(post);
+    return post;
+  }
+  // add img
+  async addImg(postId: string, newImg: ImgDTO): Promise<PostEntity> {
+    const post = await this.getPost(postId);
+    const img = await this.imgPostRepository.save({ ...newImg, post });
+    await this.postRepository.save(post);
+    await this.imgPostRepository.save(img);
     return post;
   }
 }
