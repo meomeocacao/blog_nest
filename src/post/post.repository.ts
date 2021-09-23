@@ -1,3 +1,4 @@
+import { Comment } from 'src/entity/comment.entity';
 import { PostEntity } from 'src/entity/post.entity';
 import { User } from 'src/entity/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
@@ -12,17 +13,44 @@ export class PostRepository extends Repository<PostEntity> {
   // }
   // get all post  user
   async getAllPostByUser(user: User): Promise<PostEntity[]> {
+    console.log('test');
+
     return await this.find({
-      where: { user: user, isDelete: false },
-      //   relations: ['imgposts', 'comments', 'categories', 'user', 'tags'],
+      where: {
+        user: user,
+        isDelete: false,
+        // imgposts: { isDelete: false },
+        // comments: { isDelete: false },
+      },
+      // relations: ['imgposts', 'comments', 'categories', 'user', 'tags'],
       relations: this.RELATIONS,
-      withDeleted: true,
     });
   }
   //   get all post
   async getAllPost(): Promise<PostEntity[]> {
-    return await this.find({ relations: this.RELATIONS });
+    return await this.find({
+      where: {
+        isDelete: false,
+        // imgposts: { isDelete: false },
+        // comments: { isDelete: false },
+      },
+      relations: this.RELATIONS,
+    });
   }
+
+  async getAllPosts(user: User | null): Promise<PostEntity[]> {
+    return await this.find({
+      where: {
+        user: user,
+        isDelete: false,
+        // imgposts: { isDelete: false },
+        // comments: { isDelete: false },
+      },
+      //   relations: ['imgposts', 'comments', 'categories', 'user', 'tags'],
+      relations: this.RELATIONS,
+    });
+  }
+
   //   get post by Id
   async getPostById(id: string): Promise<PostEntity> {
     return await this.findOne({
@@ -38,6 +66,8 @@ export class PostRepository extends Repository<PostEntity> {
         user: user,
         id: id,
         isDelete: false,
+        // imgposts: { isDelete: false },
+        // comments: { isDelete: false },
       },
     });
   }

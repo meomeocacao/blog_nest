@@ -7,15 +7,12 @@ import { PostEntity } from './post.entity';
 @Entity()
 export class Tag extends BaseEntity {
   @IsNotEmpty()
-  @Column()
-  title: string;
+  @PrimaryColumn()
+  tag: string;
 
   @IsNotEmpty()
   @Column()
   content: string;
-
-  @Column({ default: false })
-  published: boolean;
 
   @ManyToMany(() => PostEntity, (post) => post.tags, {
     cascade: true,

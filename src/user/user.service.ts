@@ -24,30 +24,38 @@ export class UserService {
   //   return await this.userRepository.getUser(userFilterDto);
   // }
   async getUser(): Promise<User[]> {
-    return await this.userRepository.find({
-      where: { isDelete: false },
+    const users = await this.userRepository.find({
       relations: ['posts'],
-      withDeleted: false,
     });
+   
+    return users;
   }
   //   get User by Id
   async getUserById(id: string): Promise<User> {
     const found = await this.userRepository.findOne({
-      select: ['password'],
       where: {
         id: id,
       },
       relations: ['posts'],
     });
+
+    found.posts = found.posts.filter((post) => post.isDelete == false);
     if (!found) {
       throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    if (found.posts.length <= 0) {
+      throw new NotFoundException(`User not have any post`);
     }
     return found;
   }
   //   get User by any
   async getUserByAny(value: string): Promise<User> {
     const found = await this.userRepository.findOne({
-      where: [{ id: value }, { username: value }, { email: value }],
+      where: [
+        { id: value, posts: { published: true } },
+        { username: value, posts: { published: true } },
+        { email: value, posts: { published: true } },
+      ],
       relations: ['posts'],
       withDeleted: true,
     });
