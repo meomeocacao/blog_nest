@@ -26,6 +26,8 @@ import { extname } from 'path';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 export const multerOptions = {
   // Check the mimetypes to allow for upload
@@ -57,6 +59,7 @@ export const multerOptions = {
 };
 
 @Controller('post')
+@UseGuards(LocalAuthGuard, RolesGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
   urlImage(filename) {
@@ -94,7 +97,7 @@ export class PostController {
     return await this.postService.createNewPost(userId, newPost);
   }
 
-  // PATCh soft delete post
+  // PATCH soft delete post
   @Patch('/:postId/delete')
   async softDelPost(@Param('postId') postId: string): Promise<string> {
     console.log('Soft Delete post');

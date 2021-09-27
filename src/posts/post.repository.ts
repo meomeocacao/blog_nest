@@ -1,10 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
 import { Comment } from 'src/entities/comment.entity';
 import { PostEntity } from 'src/entities/post.entity';
 import { User } from 'src/entities/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
-import { CommentDTO } from './dtos/comment.dto';
-import { CreatePostDTO, FilterPostDTO, UpdatePostDTO } from './dtos/post.dto';
+import { FilterPostDTO, UpdatePostDTO } from './dtos/post.dto';
 
 @EntityRepository(PostEntity)
 export class PostRepository extends Repository<PostEntity> {
@@ -37,7 +35,7 @@ export class PostRepository extends Repository<PostEntity> {
       .leftJoinAndSelect('post.categories', 'category')
       .leftJoinAndSelect('post.comments', 'comment', 'comment.isDelete=false')
       .andWhere('post.isDelete = false')
-      .andWhere('post.id =:id', { id: id })
+      .andWhere('post.id =:id', { id })
       .getOne();
   }
 
@@ -48,9 +46,9 @@ export class PostRepository extends Repository<PostEntity> {
       .leftJoinAndSelect('post.categories', 'category')
       .leftJoinAndSelect('post.comments', 'comment', 'comment.isDelete=false')
       .andWhere('post.isDelete = false')
-      .andWhere('post.id  =:id', { id: id })
+      .andWhere('post.id  =:id', { id })
       .leftJoin('post.user', 'user')
-      .andWhere('user.id =:user', { user: user })
+      .andWhere('user.id =:user', { user })
       .getOne();
   }
 
@@ -65,12 +63,12 @@ export class PostRepository extends Repository<PostEntity> {
       query
         .leftJoinAndSelect('post.categories', 'category')
         .andWhere('LOWER(category.title) = LOWER(:category)', {
-          category: category,
+          category,
         });
     if (tag)
       query
         .leftJoinAndSelect('post.tags', 'tag')
-        .andWhere('LOWER(tag.title) = LOWER(:tag)', { tag: tag });
+        .andWhere('LOWER(tag.title) = LOWER(:tag)', { tag });
 
     const posts = query.andWhere('post.isDelete = false').getMany();
     return posts;
@@ -80,7 +78,7 @@ export class PostRepository extends Repository<PostEntity> {
     return this.createQueryBuilder('post')
       .leftJoinAndSelect('post.comments', 'comment', 'comment.isDelete=false')
       .leftJoinAndSelect('post.tags', 'tag')
-      .where('comment.id = :cmtId', { cmtId: cmtId })
+      .where('comment.id = :cmtId', { cmtId })
       .andWhere('comment.isDelete = false')
       .andWhere('isDelete = false')
       .getOne();
@@ -91,7 +89,7 @@ export class PostRepository extends Repository<PostEntity> {
       .update(PostEntity)
       .set({ title: updatePostDto.title, content: updatePostDto.content })
       .where('isDelete = false')
-      .andWhere('id =:postId', { postId: postId })
+      .andWhere('id =:postId', { postId })
       .execute();
   }
   // delete all category from post
@@ -99,7 +97,7 @@ export class PostRepository extends Repository<PostEntity> {
     this.createQueryBuilder()
       .update(PostEntity)
       .set({ categories: [] })
-      .where('id =:postId', { postId: postId })
+      .where('id =:postId', { postId })
       .andWhere('isDelete = false')
       .execute();
   }
@@ -111,8 +109,8 @@ export class PostRepository extends Repository<PostEntity> {
     return this.createQueryBuilder('post')
       .leftJoinAndSelect('post.comments', 'comment', 'comment.isDelete=false')
       .leftJoinAndSelect('post.categories', 'category')
-      .where('category.id = :cateId', { cateId: cateId })
-      .andWhere('id =:postId', { postId: postId })
+      .where('category.id = :cateId', { cateId })
+      .andWhere('id =:postId', { postId })
       .andWhere('post.isDelete = false')
       .getOne();
   }
@@ -124,8 +122,8 @@ export class PostRepository extends Repository<PostEntity> {
     return this.createQueryBuilder('post')
       .leftJoinAndSelect('post.tags', 'tag')
       .leftJoinAndSelect('post.comments', 'comment', 'comment.isDelete=false')
-      .where('tag.id  =:tagId', { tagId: tagId })
-      .andWhere('post.id =:postId', { postId: postId })
+      .where('tag.id  =:tagId', { tagId })
+      .andWhere('post.id =:postId', { postId })
       .andWhere('post.isDelete = false')
       .getOne();
   }
@@ -137,8 +135,8 @@ export class PostRepository extends Repository<PostEntity> {
     return this.createQueryBuilder('post')
       .leftJoinAndSelect('post.imgposts', 'img')
       .leftJoinAndSelect('post.comments', 'comment', 'comment.isDelete=false')
-      .where('img.id=:imgId', { imgId: imgId })
-      .andWhere('post.id =:postId', { postId: postId })
+      .where('img.id=:imgId', { imgId })
+      .andWhere('post.id =:postId', { postId })
       .andWhere('post.isDelete = false')
       .getOne();
   }
