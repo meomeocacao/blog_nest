@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { PrimaryColumn } from 'typeorm';
 
 export class CreateUserDTO {
@@ -6,7 +6,7 @@ export class CreateUserDTO {
   @IsNotEmpty()
   @Length(4, 20)
   username: string;
-  
+
   @IsEmail()
   @PrimaryColumn()
   email: string;

@@ -1,6 +1,5 @@
-/* eslint-disable prettier/prettier */
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryColumn } from 'typeorm';
+import { IsNotEmpty } from 'class-validator';
+import { Column, Entity, ManyToMany } from 'typeorm';
 import { BaseEntity } from './base.interface';
 import { PostEntity } from './post.entity';
 
@@ -14,6 +13,6 @@ export class Category extends BaseEntity {
   @Column()
   content: string;
 
-  @ManyToMany(()=> PostEntity, post => post.categories,{cascade: true})
+  @ManyToMany(() => PostEntity, (post) => post.categories, { cascade: true })
   posts: PostEntity[];
 }

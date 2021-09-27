@@ -8,7 +8,7 @@ export class CategoryDTO {
   content: string;
 }
 
-export class CategoryFilterDTO{
+export class CategoryFilterDTO {
   @IsNotEmpty()
   title: string;
 }

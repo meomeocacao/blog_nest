@@ -9,9 +9,8 @@ import { UserRepository } from './user.repository';
 import { CreateUserDTO, UpdateUserDTO, UserFilterDTO } from './dtos/user.dto';
 import * as bcrypt from 'bcryptjs';
 import { Category } from 'src/entities/category.entity';
-import { Brackets, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CategoryDTO } from 'src/posts/dtos/category.dto';
-import { response } from 'express';
 
 @Injectable()
 export class UserService {
@@ -46,7 +45,7 @@ export class UserService {
     if (checkEmail) throw new ConflictException(`Email is used`);
     // hash
     const salt = await bcrypt.genSalt();
-    createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+    createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
     return await this.userRepository.save(createUserDto);
   }
 
@@ -68,7 +67,9 @@ export class UserService {
 
     // hash
     const salt = await bcrypt.genSalt();
-    updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+    }
     await this.userRepository.update({ id: user.id }, updateUserDto);
     return await this.userRepository.checkUserByQuery(id);
   }
@@ -89,9 +90,10 @@ export class UserService {
 
   // get user by username
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({
-      select: ['password'],
-      where: { username: username },
-    });
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.username = :username', { username: username })
+      .getOne();
   }
 }

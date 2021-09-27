@@ -10,10 +10,8 @@ import { Brackets, Repository } from 'typeorm';
 import { PostRepository } from './post.repository';
 import { CategoryDTO } from './dtos/category.dto';
 import { CommentDTO, UpdateCommentDTO } from './dtos/comment.dto';
-import { ImgDTO } from './dtos/img.dto';
 import { CreatePostDTO, FilterPostDTO, UpdatePostDTO } from './dtos/post.dto';
 import { TagDTO } from './dtos/tag.dto';
-import { UserService } from 'src/users/user.service';
 
 @Injectable()
 export class PostService {
@@ -45,15 +43,29 @@ export class PostService {
       .getOne();
   }
 
+  // get tag by title
+  checkExistTag(tag_title: string): Promise<Tag | undefined> {
+    return this.tagRepository.findOne({ title: tag_title });
+  }
+
+  // get cate by title
+  checkExistCate(cate_title: string): Promise<Category | undefined> {
+    return this.cateRepository.findOne({ title: cate_title });
+  }
   // create new Post
   async createNewPost(
     userId: string,
     newPost: CreatePostDTO,
   ): Promise<PostEntity | undefined> {
     const user = await this.getUser(userId);
-
+    // const cate = await this.checkExistCate(newPost.category);
+    // const tag = await this.checkExistTag(newPost.tag);
     const post = await this.postRepository.create({ ...newPost, user: user });
-    await this.userRepository.createQueryBuilder().relation(User, 'posts').of(user).add(post);
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(User, 'posts')
+      .of(user)
+      .add(post);
     return await this.postRepository.save(post);
   }
 
@@ -88,8 +100,8 @@ export class PostService {
   }
 
   // create comment
-  createComment(newComment: CommentDTO, post: PostEntity){
-    return this.commentRepository.save({...newComment, post});
+  createComment(newComment: CommentDTO, post: PostEntity) {
+    return this.commentRepository.save({ ...newComment, post });
   }
 
   // add comment
@@ -98,7 +110,7 @@ export class PostService {
     newComment: CommentDTO,
   ): Promise<PostEntity | undefined> {
     const post = await this.postRepository.getPostById(postId);
-    const cmt = await this.createComment(newComment, post );
+    const cmt = await this.createComment(newComment, post);
     this.postRepository.addCommentToPost(post, cmt);
     return this.postRepository.getPostById(postId);
   }

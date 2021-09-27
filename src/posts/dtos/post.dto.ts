@@ -1,6 +1,3 @@
-import { User } from 'src/entities/user.entity';
-import { UpdateDateColumn } from 'typeorm';
-
 export class PostDTO {
   title: string;
   content: string;
@@ -11,13 +8,19 @@ export class PostDTO {
 export class CreatePostDTO {
   title: string;
   content: string;
+  urlImg?: string;
+  tag?: string;
+  category?: string;
 }
 export class UpdatePostDTO {
   title: string;
   content: string;
+  urlImg?: string;
+  tag?: string;
+  category?: string;
 }
 
-export class FilterPostDTO{
+export class FilterPostDTO {
   tag?: string;
-  category?:string;
+  category?: string;
 }

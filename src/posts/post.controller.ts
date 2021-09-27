@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -10,6 +9,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -22,7 +22,10 @@ import { CategoryDTO, CategoryFilterDTO } from './dtos/category.dto';
 import { CommentDTO, UpdateCommentDTO } from './dtos/comment.dto';
 import { CreatePostDTO, FilterPostDTO, UpdatePostDTO } from './dtos/post.dto';
 import { TagDTO } from './dtos/tag.dto';
-import path, { extname } from 'path';
+import { extname } from 'path';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/role.enum';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 export const multerOptions = {
   // Check the mimetypes to allow for upload
@@ -42,10 +45,10 @@ export const multerOptions = {
     }
   },
   storage: diskStorage({
-    destination: './uploads/postphoto/',
+    destination: process.env.UPLOAD_LOCATION,
     // destination: process.env.UPLOAD_LOCATION,
     filename: (req, file, cb) => {
-      const filename: string = `${Date.now()}.${extname(file.originalname)}`;
+      const filename = `${Date.now()}.${extname(file.originalname)}`;
       // const extension: string = path.parse(file.originalname).ext;
       cb(null, `${filename}`);
       // cb(null, `${filename}${extension}`);
@@ -57,7 +60,7 @@ export const multerOptions = {
 export class PostController {
   constructor(private readonly postService: PostService) {}
   urlImage(filename) {
-    return `./uploads/postImages/${filename}`;
+    return `${process.env.UPLOAD_LOCATION}${filename}`;
   }
   //   GET all post post/
   @Get()
@@ -124,6 +127,7 @@ export class PostController {
   @Post('/:postId/cmt')
   async addComment(
     @Param('postId') postId: string,
+    // @Param('userId') userId: string,
     @Body() newCmt: CommentDTO,
   ): Promise<PostEntity> {
     console.log('Add comment to post');
@@ -195,7 +199,7 @@ export class PostController {
   }
 
   // POST post/:postId/cate
-  @Post('/category/:postId')
+  @Post('/category/add/:postId')
   async addCateToPost(
     @Param('postId') postId: string,
     @Body() cateTitle: CategoryFilterDTO,
@@ -206,6 +210,8 @@ export class PostController {
   }
   // POST post/cate
   @Post('/category/add')
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
   async addCate(@Body() newCate: CategoryDTO): Promise<Category[]> {
     console.log('Add category');
 

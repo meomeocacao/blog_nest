@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { User } from 'src/entities/user.entity';
 import { Brackets, EntityRepository, Repository } from 'typeorm';
-import { UpdateUserDTO, UserFilterDTO } from './dtos/user.dto';
+import { UserFilterDTO } from './dtos/user.dto';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -42,6 +42,7 @@ export class UserRepository extends Repository<User> {
   // check user by username/id/email
   async checkUserByQuery(queryString: string): Promise<User | undefined> {
     return await this.createQueryBuilder('user')
+      .leftJoinAndSelect('user.posts', 'post', 'post.isDelete = false')
       .where('user.username = :username', { username: queryString })
       .orWhere('user.email = :email', { email: queryString })
       .orWhere('user.id = :id', { id: queryString })
@@ -62,5 +63,4 @@ export class UserRepository extends Repository<User> {
       .where('post.isDelete = :false', { false: false })
       .getMany();
   }
-  
 }

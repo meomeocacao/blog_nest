@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Category } from 'src/entities/category.entity';
 import { Comment } from 'src/entities/comment.entity';
 import { ImgPost } from 'src/entities/imgpost.entity';
