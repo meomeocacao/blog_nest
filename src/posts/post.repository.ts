@@ -23,7 +23,7 @@ export class PostRepository extends Repository<PostEntity> {
       .leftJoinAndSelect('post.tags', 'tag')
       .leftJoinAndSelect('post.categories', 'category')
       .leftJoinAndSelect('post.comments', 'comment', 'comment.isDelete=false')
-      .andWhere('user.id = :id', { id: userId })
+      .andWhere('user.id = :userId', { userId })
       .andWhere('post.isDelete = false')
       .getMany();
   }
