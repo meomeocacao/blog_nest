@@ -8,6 +8,8 @@ import {
   Patch,
   Post,
   Query,
+  Request,
+  Response,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -28,6 +30,7 @@ import { Role } from 'src/auth/enums/role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AllowAny } from 'src/auth/decorators/allowany.decorator';
 
 export const multerOptions = {
   // Check the mimetypes to allow for upload
@@ -121,8 +124,14 @@ export class PostController {
 
   // GET post/:postId/cmt
   @Get('/:postId/cmt')
-  async getCmtByPost(@Param('postId') postId: string): Promise<Comment[]> {
+  @AllowAny()
+  async getCmtByPost(
+    @Param('postId') postId: string,
+    @Request() request,
+  ): Promise<Comment[]> {
     console.log('Get comment by post');
+
+    request.user;
 
     return await this.postService.getCommentByPostId(postId);
   }
@@ -134,7 +143,6 @@ export class PostController {
     @Body() newCmt: CommentDTO,
   ): Promise<PostEntity> {
     console.log('Add comment to post');
-
     return await this.postService.addComment(postId, newCmt);
   }
   // PATCH post/:cmtId
