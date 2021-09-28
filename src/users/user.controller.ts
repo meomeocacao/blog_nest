@@ -6,14 +6,19 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { Category } from 'src/entities/category.entity';
 import { User } from 'src/entities/user.entity';
 import { CategoryDTO } from 'src/posts/dtos/category.dto';
 import { UserService } from './user.service';
 import { CreateUserDTO, UpdateUserDTO, UserFilterDTO } from './dtos/user.dto';
-
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/role.enum';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 @Controller('user')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -51,6 +56,7 @@ export class UserController {
 
   // add Category
   @Post('category')
+  @Roles(Role.ADMIN)
   async addCategory(@Body() newCate: CategoryDTO): Promise<Category> {
     return this.userService.addCategory(newCate);
   }

@@ -1,3 +1,8 @@
-import { SetMetadata } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const AllowAny = () => SetMetadata('allow-any', true);
+export const CurrentUser = createParamDecorator(
+  (data: unknown, context: ExecutionContext) => {
+    const req = context.switchToHttp().getRequest();
+    return req.user;
+  },
+);

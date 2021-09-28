@@ -8,8 +8,6 @@ import {
   Patch,
   Post,
   Query,
-  Request,
-  Response,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -28,9 +26,9 @@ import { extname } from 'path';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { AllowAny } from 'src/auth/decorators/allowany.decorator';
+import { CurrentUser } from 'src/auth/decorators/allowany.decorator';
+import { User } from 'src/entities/user.entity';
 
 export const multerOptions = {
   // Check the mimetypes to allow for upload
@@ -62,7 +60,7 @@ export const multerOptions = {
 };
 
 @Controller('post')
-@UseGuards(LocalAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
   urlImage(filename) {
@@ -82,22 +80,22 @@ export class PostController {
 
     return await this.postService.getPostById(postId);
   }
-  //   GET post/:userId
-  @Get('/user/:userId')
-  async getPostByUser(@Param('userId') userId: string): Promise<PostEntity[]> {
+  //   GET post /get/post
+  @Get('/get/post')
+  async getPostByUser(@CurrentUser() user: User): Promise<PostEntity[]> {
     console.log('Get all post by user');
 
-    return await this.postService.getAllPostByUser(userId);
+    return await this.postService.getAllPostByUser(user);
   }
-  // POST post/:userId
-  @Post('/:userId')
+  // POST post/create
+  @Post('/create')
   async createPost(
-    @Param('userId') userId: string,
+    @CurrentUser() user: User,
     @Body() newPost: CreatePostDTO,
   ): Promise<PostEntity> {
     console.log('Create post');
 
-    return await this.postService.createNewPost(userId, newPost);
+    return await this.postService.createNewPost(user, newPost);
   }
 
   // PATCH soft delete post
@@ -124,14 +122,11 @@ export class PostController {
 
   // GET post/:postId/cmt
   @Get('/:postId/cmt')
-  @AllowAny()
   async getCmtByPost(
-    @Param('postId') postId: string,
-    @Request() request,
+    @Param('postId')
+    postId: string,
   ): Promise<Comment[]> {
     console.log('Get comment by post');
-
-    request.user;
 
     return await this.postService.getCommentByPostId(postId);
   }
@@ -139,11 +134,11 @@ export class PostController {
   @Post('/:postId/cmt')
   async addComment(
     @Param('postId') postId: string,
-    // @Param('userId') userId: string,
+    @CurrentUser() user: User,
     @Body() newCmt: CommentDTO,
   ): Promise<PostEntity> {
     console.log('Add comment to post');
-    return await this.postService.addComment(postId, newCmt);
+    return await this.postService.addComment(postId, newCmt, user);
   }
   // PATCH post/:cmtId
   @Patch('/cmt/:cmtId')
@@ -155,7 +150,13 @@ export class PostController {
 
     return await this.postService.updateComment(cmtId, updateCmt);
   }
+  // PATCH post/cmt/del/:cmtId
+  @Patch('/cmt/del/:cmtId')
+  async sofDeleteCmt(@Param('cmtId') cmtId: string): Promise<any> {
+    console.log('Soft delete comment');
 
+    return await this.postService.deleteCmt(cmtId);
+  }
   /*
   Tag
   */
@@ -223,7 +224,7 @@ export class PostController {
   @Post('/category/add')
   @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
-  async addCate(@Body() newCate: CategoryDTO): Promise<Category[]> {
+  async addCate(@Body() newCate: CategoryDTO): Promise<Category> {
     console.log('Add category');
 
     return await this.postService.addCategory(newCate);

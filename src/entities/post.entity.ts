@@ -33,7 +33,10 @@ export class PostEntity extends BaseEntity {
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
-  @ManyToOne(() => User, (user) => user.posts, {cascade: true})
+  @ManyToOne(() => User, (user) => user.posts, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
   user: User;
 
   @ManyToMany(() => Tag, (tag) => tag.posts)

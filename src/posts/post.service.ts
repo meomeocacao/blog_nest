@@ -6,7 +6,7 @@ import { ImgPost } from 'src/entities/imgpost.entity';
 import { PostEntity } from 'src/entities/post.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { User } from 'src/entities/user.entity';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, In, Repository } from 'typeorm';
 import { PostRepository } from './post.repository';
 import { CategoryDTO } from './dtos/category.dto';
 import { CommentDTO, UpdateCommentDTO } from './dtos/comment.dto';
@@ -44,29 +44,45 @@ export class PostService {
   }
 
   // get tag by title
-  checkExistTag(tag_title: string): Promise<Tag | undefined> {
+  checkExistTag(tag_title: string): Promise<Tag> {
     return this.tagRepository.findOne({ title: tag_title });
   }
 
+  // get tag from array
+  getArrTag(tag_title: string[]): Promise<Tag[]> {
+    return this.tagRepository.find({
+      where: {
+        title: In(tag_title),
+      },
+    });
+  }
+
+  // get category from array
+  getArrCate(cate_title: string[]): Promise<Tag[]> {
+    return this.cateRepository.find({
+      where: { title: In(cate_title) },
+    });
+  }
   // get cate by title
   checkExistCate(cate_title: string): Promise<Category | undefined> {
     return this.cateRepository.findOne({ title: cate_title });
   }
   // create new Post
   async createNewPost(
-    userId: string,
+    currUser: User,
     newPost: CreatePostDTO,
   ): Promise<PostEntity | undefined> {
-    const user = await this.getUser(userId);
-    // const cate = await this.checkExistCate(newPost.category);
-    // const tag = await this.checkExistTag(newPost.tag);
-    const post = await this.postRepository.create({ ...newPost, user: user });
-    await this.userRepository
-      .createQueryBuilder()
-      .relation(User, 'posts')
-      .of(user)
-      .add(post);
-    return await this.postRepository.save(post);
+    const user = await this.getUser(currUser.id);
+    const tags = await this.getArrTag(newPost.tag);
+    console.log(tags);
+    const categories = await this.getArrCate(newPost.category);
+    const { category, tag, ...formattedNewPost } = newPost;
+    return await this.postRepository.save({
+      ...formattedNewPost,
+      user,
+      categories,
+      tags,
+    });
   }
 
   // get post by id
@@ -80,9 +96,8 @@ export class PostService {
   }
 
   // get all post from user
-  async getAllPostByUser(userId: string): Promise<PostEntity[]> {
-    const user = await this.getUser(userId);
-    return await this.postRepository.getAllPostByUser(user.id);
+  async getAllPostByUser(user: User): Promise<PostEntity[]> {
+    return await this.postRepository.find({ user });
   }
   // softdelete post
   async softDelPostById(postId: string): Promise<string> {
@@ -100,20 +115,28 @@ export class PostService {
   }
 
   // create comment
-  createComment(newComment: CommentDTO, post: PostEntity) {
-    return this.commentRepository.save({ ...newComment, post });
+  async createComment(
+    newComment: CommentDTO,
+    post: PostEntity,
+    currUser: User,
+  ) {
+    const user = await this.getUser(currUser.id);
+    return await this.commentRepository.save({ ...newComment, post, user });
   }
 
   // add comment
   async addComment(
     postId: string,
     newComment: CommentDTO,
+    currUser: User,
   ): Promise<PostEntity | undefined> {
+    const user = await this.getUser(currUser.id);
     const post = await this.postRepository.getPostById(postId);
-    const cmt = await this.createComment(newComment, post);
+    const cmt = await this.createComment(newComment, post, user);
     this.postRepository.addCommentToPost(post, cmt);
     return this.postRepository.getPostById(postId);
   }
+
   // update comment
   async updateComment(
     cmtId: string,
@@ -164,11 +187,18 @@ export class PostService {
     return this.commentRepository
       .createQueryBuilder('comment')
       .leftJoin('comment.post', 'post')
-      .where(`post.id=:postId`, { postId: postId })
+      .where(`post.id=:postId`, { postId })
       .andWhere(`post.isDelete = false`)
       .andWhere(`comment.isDelete = false`)
       .getMany();
   }
+
+  // delete comment by id
+  async deleteCmt(cmtId: string): Promise<any> {
+    await this.commentRepository.update(cmtId, { isDelete: true });
+    return `Comment deleted!`;
+  }
+
   // add tag to post
   async addTagToPost(
     postId: string,
@@ -202,17 +232,19 @@ export class PostService {
   }
 
   // add category to category
-  async addCategory(newCate: CategoryDTO): Promise<Category[]> {
+  async addCategory(newCate: CategoryDTO): Promise<Category | undefined> {
+    // check exist
+    const cate = await this.cateRepository.findOne({ title: newCate.title });
+    if (cate) return cate;
     // add category
-    await this.cateRepository.save(newCate);
-    return await this.cateRepository.find();
+    return await this.cateRepository.save(newCate);
   }
   // get all category from post
   async getCateByPostId(postId: string): Promise<Category[]> {
     const categories = await this.cateRepository
       .createQueryBuilder('category')
       .leftJoinAndSelect('category.posts', 'post')
-      .where(`post.id = :postId`, { postId: postId })
+      .where(`post.id = :postId`, { postId })
       .andWhere('post.isDelete =false')
       .getMany();
     return categories;
@@ -239,7 +271,7 @@ export class PostService {
   // delete all category from post
   async deleteAllCateByPostId(postId: string): Promise<PostEntity | undefined> {
     await this.postRepository.deleteAllCategory(postId);
-    return this.postRepository.getPostById(postId);
+    return await this.postRepository.getPostById(postId);
   }
   // filter post
   async filterPost(filterDto: FilterPostDTO): Promise<PostEntity[]> {

@@ -7,6 +7,7 @@ import { PostEntity } from './post.entity';
 @Entity()
 export class Tag extends BaseEntity {
   @IsNotEmpty()
+  @Column()
   title: string;
 
   @IsNotEmpty()
