@@ -7,11 +7,14 @@ import { PostEntity } from 'src/entities/post.entity';
 import { Tag } from 'src/entities/tag.entity';
 import { User } from 'src/entities/user.entity';
 import { Brackets, In, Repository } from 'typeorm';
+import { CategoryDTO } from './dtos/category.dtos/category.dto';
+import { CommentDTO } from './dtos/comment.dtos/comment.dto';
+import { UpdateCommentDTO } from './dtos/comment.dtos/update-comment.dto';
+import { CreatePostDTO } from './dtos/post.dtos/create-post.dto';
+import { FilterPostDTO } from './dtos/post.dtos/filter-post.dto';
+import { UpdatePostDTO } from './dtos/post.dtos/update-post.dto';
+import { TagDTO } from './dtos/tag.dtos/tag.dto';
 import { PostRepository } from './post.repository';
-import { CategoryDTO } from './dtos/category.dto';
-import { CommentDTO, UpdateCommentDTO } from './dtos/comment.dto';
-import { CreatePostDTO, FilterPostDTO, UpdatePostDTO } from './dtos/post.dto';
-import { TagDTO } from './dtos/tag.dto';
 
 @Injectable()
 export class PostService {

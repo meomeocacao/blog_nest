@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty } from 'class-validator';
-import { PostDTO } from 'src/posts/dtos/post.dto';
 import {
   Column,
   Entity,
@@ -8,7 +7,6 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.interface';
 import { Category } from './category.entity';

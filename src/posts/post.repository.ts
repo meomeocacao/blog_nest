@@ -2,7 +2,8 @@ import { Comment } from 'src/entities/comment.entity';
 import { PostEntity } from 'src/entities/post.entity';
 import { User } from 'src/entities/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
-import { FilterPostDTO, UpdatePostDTO } from './dtos/post.dto';
+import { FilterPostDTO } from './dtos/post.dtos/filter-post.dto';
+import { UpdatePostDTO } from './dtos/post.dtos/update-post.dto';
 
 @EntityRepository(PostEntity)
 export class PostRepository extends Repository<PostEntity> {

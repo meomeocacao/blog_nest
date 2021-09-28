@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryColumn } from 'typeorm';
+import { IsNotEmpty } from 'class-validator';
+import { Column, Entity, ManyToMany } from 'typeorm';
 import { BaseEntity } from './base.interface';
 import { PostEntity } from './post.entity';
 

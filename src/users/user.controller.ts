@@ -10,13 +10,13 @@ import {
 } from '@nestjs/common';
 import { Category } from 'src/entities/category.entity';
 import { User } from 'src/entities/user.entity';
-import { CategoryDTO } from 'src/posts/dtos/category.dto';
 import { UserService } from './user.service';
 import { CreateUserDTO, UpdateUserDTO, UserFilterDTO } from './dtos/user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CategoryDTO } from 'src/posts/dtos/category.dtos/category.dto';
 @Controller('user')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {

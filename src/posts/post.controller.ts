@@ -18,10 +18,6 @@ import { Category } from 'src/entities/category.entity';
 import { Comment } from 'src/entities/comment.entity';
 import { PostEntity } from 'src/entities/post.entity';
 import { PostService } from './post.service';
-import { CategoryDTO, CategoryFilterDTO } from './dtos/category.dto';
-import { CommentDTO, UpdateCommentDTO } from './dtos/comment.dto';
-import { CreatePostDTO, FilterPostDTO, UpdatePostDTO } from './dtos/post.dto';
-import { TagDTO } from './dtos/tag.dto';
 import { extname } from 'path';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
@@ -29,6 +25,14 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CurrentUser } from 'src/auth/decorators/allowany.decorator';
 import { User } from 'src/entities/user.entity';
+import { CreatePostDTO } from './dtos/post.dtos/create-post.dto';
+import { UpdatePostDTO } from './dtos/post.dtos/update-post.dto';
+import { CommentDTO } from './dtos/comment.dtos/comment.dto';
+import { UpdateCommentDTO } from './dtos/comment.dtos/update-comment.dto';
+import { TagDTO } from './dtos/tag.dtos/tag.dto';
+import { CategoryFilterDTO } from './dtos/category.dtos/category-filter.dto';
+import { CategoryDTO } from './dtos/category.dtos/category.dto';
+import { FilterPostDTO } from './dtos/post.dtos/filter-post.dto';
 
 export const multerOptions = {
   // Check the mimetypes to allow for upload

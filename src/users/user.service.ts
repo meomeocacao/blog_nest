@@ -9,8 +9,8 @@ import { UserRepository } from './user.repository';
 import { CreateUserDTO, UpdateUserDTO, UserFilterDTO } from './dtos/user.dto';
 import { Category } from 'src/entities/category.entity';
 import { Repository } from 'typeorm';
-import { CategoryDTO } from 'src/posts/dtos/category.dto';
 import { hashPass } from 'src/auth/strategies/constants';
+import { CategoryDTO } from 'src/posts/dtos/category.dtos/category.dto';
 
 @Injectable()
 export class UserService {
