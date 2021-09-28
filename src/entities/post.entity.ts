@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty } from 'class-validator';
-import { PostDTO } from 'src/posts/dtos/post.dto';
 import {
   Column,
   Entity,
@@ -8,7 +7,6 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.interface';
 import { Category } from './category.entity';
@@ -33,7 +31,10 @@ export class PostEntity extends BaseEntity {
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
-  @ManyToOne(() => User, (user) => user.posts, {cascade: true})
+  @ManyToOne(() => User, (user) => user.posts, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
   user: User;
 
   @ManyToMany(() => Tag, (tag) => tag.posts)

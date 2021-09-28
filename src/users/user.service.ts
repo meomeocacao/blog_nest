@@ -7,10 +7,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { UserRepository } from './user.repository';
 import { CreateUserDTO, UpdateUserDTO, UserFilterDTO } from './dtos/user.dto';
-import * as bcrypt from 'bcryptjs';
 import { Category } from 'src/entities/category.entity';
 import { Repository } from 'typeorm';
-import { CategoryDTO } from 'src/posts/dtos/category.dto';
+import { hashPass } from 'src/auth/strategies/constants';
+import { CategoryDTO } from 'src/posts/dtos/category.dtos/category.dto';
 
 @Injectable()
 export class UserService {
@@ -44,8 +44,7 @@ export class UserService {
     if (checkUser) throw new ConflictException(`Username is used`);
     if (checkEmail) throw new ConflictException(`Email is used`);
     // hash
-    const salt = await bcrypt.genSalt();
-    createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
+    createUserDto.password = await hashPass(createUserDto.password);
     return await this.userRepository.save(createUserDto);
   }
 
@@ -66,10 +65,10 @@ export class UserService {
       throw new ConflictException(`Email ${updateUserDto.email} is used`);
 
     // hash
-    const salt = await bcrypt.genSalt();
     if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+      updateUserDto.password = await hashPass(updateUserDto.password);
     }
+
     await this.userRepository.update({ id: user.id }, updateUserDto);
     return await this.userRepository.checkUserByQuery(id);
   }
