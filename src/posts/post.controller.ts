@@ -259,15 +259,18 @@ export class PostController {
     @UploadedFile() file,
     @CurrentUser() user: User,
     @Body() createPostDto: CreatePostDTO,
-  ): Promise<PostEntity> {
+  ) {
     console.log('Upload post with image');
     const url: string = process.env.UPLOAD_LOCATION + file.filename;
     console.log(url);
-    return await this.postService.createPostWithImg(
-      url,
-      createPostDto,
-      user.id,
-    );
+    console.log(createPostDto);
+    console.log(user);
+
+    // return await this.postService.createPostWithImg(
+    //   url,
+    //   createPostDto,
+    //   user.id,
+    // );
   }
   // PATCH post/image/:postId
   @Patch('/image/:postId/:imgId')

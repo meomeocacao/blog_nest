@@ -28,10 +28,10 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
-      refresh_token: this.jwtService.sign(payload, {
-        secret: jwtConstants.refreshSecret,
-        expiresIn: jwtConstants.accessExpires,
-      }),
+      // refresh_token: this.jwtService.sign(payload, {
+      //   secret: jwtConstants.refreshSecret,
+      //   expiresIn: jwtConstants.accessExpires,
+      // }),
     };
   }
 
@@ -53,5 +53,9 @@ export class AuthService {
 
   addRefreshToken(userId: string, refrehsToken: string) {
     this.userService.addRefreshToken(userId, refrehsToken);
+  }
+
+  removeRefreshToken(userId: string) {
+    this.userService.removeRefreshToken(userId);
   }
 }

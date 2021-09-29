@@ -12,7 +12,7 @@ import { Repository } from 'typeorm';
 import { hashPass } from 'src/auth/strategies/constants';
 import { CategoryDTO } from 'src/posts/dtos/category.dtos/category.dto';
 import { RefreshToken } from 'src/refresh-tokens/entities/refresh-token.entity';
-
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class UserService {
   constructor(
@@ -109,5 +109,19 @@ export class UserService {
   async addRefreshToken(id: string, _refreshToken: string) {
     const hashedRefreshToken = await hashPass(_refreshToken);
     this.userRepository.update(id, { refreshToken: hashedRefreshToken });
+  }
+
+  // check user refresh token
+  async checkRefreshToken(id: string, _refreshToken: string) {
+    const user = await this.userRepository.findOne({ id });
+    const check = await bcrypt.compare(_refreshToken, user.refreshToken);
+    if (check) {
+      return user;
+    }
+  }
+
+  // remove refresh token
+  removeRefreshToken(id: string) {
+    this.userRepository.update(id, { refreshToken: null });
   }
 }

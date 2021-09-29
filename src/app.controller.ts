@@ -27,7 +27,7 @@ export class AppController {
   @Post('login')
   async login(@CurrentUser() user: User) {
     const token = await this.authService.login(user);
-    this.authService.addRefreshToken(user.id, token.refresh_token);
+    // this.authService.addRefreshToken(user.id, token.refresh_token);
     return token;
   }
 
@@ -39,10 +39,16 @@ export class AppController {
   }
 
   // POST /register
-  @Post('register')
   async register(
     @Body() createUserDTO: CreateUserDTO,
   ): Promise<User | undefined> {
     return await this.authService.register(createUserDTO);
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('logout')
+  async logOut(@CurrentUser() user: User) {
+    await this.authService.removeRefreshToken(user.id);
+    return `Logged Out`;
   }
 }
