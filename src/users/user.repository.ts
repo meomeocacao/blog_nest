@@ -49,7 +49,7 @@ export class UserRepository extends Repository<User> {
       .getOne();
   }
   // check users by username/id/email
-  async checkUsersByQuery(queryString: string): Promise<User[] | undefined> {
+  checkUsersByQuery(queryString: string): Promise<User[] | undefined> {
     return this.createQueryBuilder('user')
       .where('user.username = :username', { username: queryString })
       .orWhere('user.email = :email', { email: queryString })

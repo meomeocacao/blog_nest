@@ -252,6 +252,23 @@ export class PostController {
     return await this.postService.getPostById(postId);
   }
 
+  // create Post
+  @Post('/upload/image/post')
+  @UseInterceptors(FileInterceptor('photo', multerOptions))
+  async uploadPost(
+    @UploadedFile() file,
+    @CurrentUser() user: User,
+    @Body() createPostDto: CreatePostDTO,
+  ): Promise<PostEntity> {
+    console.log('Upload post with image');
+    const url: string = process.env.UPLOAD_LOCATION + file.filename;
+    console.log(url);
+    return await this.postService.createPostWithImg(
+      url,
+      createPostDto,
+      user.id,
+    );
+  }
   // PATCH post/image/:postId
   @Patch('/image/:postId/:imgId')
   async deleteImgByPostId(

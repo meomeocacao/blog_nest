@@ -1,10 +1,10 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class InitialDatabase1632821069746 implements MigrationInterface {
-    name = 'InitialDatabase1632821069746'
+export class AllEntity121632903128478 implements MigrationInterface {
+    name = 'AllEntity121632903128478'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE \`blog_nest\`.\`user\` (\`id\` char(36) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`isDelete\` tinyint NOT NULL DEFAULT 0, \`username\` varchar(255) NOT NULL, \`email\` varchar(255) NOT NULL, \`password\` varchar(255) NOT NULL, \`firstname\` varchar(255) NOT NULL DEFAULT '', \`lastname\` varchar(255) NOT NULL DEFAULT '', \`profile\` varchar(255) NOT NULL DEFAULT 'My profile', \`role\` enum ('admin', 'user') NOT NULL DEFAULT 'user', PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`blog_nest\`.\`user\` (\`id\` char(36) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`isDelete\` tinyint NOT NULL DEFAULT 0, \`username\` varchar(255) NOT NULL, \`email\` varchar(255) NOT NULL, \`password\` varchar(255) NOT NULL, \`firstname\` varchar(255) NOT NULL DEFAULT '', \`lastname\` varchar(255) NOT NULL DEFAULT '', \`profile\` varchar(255) NOT NULL DEFAULT 'My profile', \`role\` enum ('admin', 'user') NOT NULL DEFAULT 'user', \`refreshToken\` varchar(255) NOT NULL DEFAULT '', UNIQUE INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` (\`email\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`blog_nest\`.\`comment\` (\`id\` char(36) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`isDelete\` tinyint NOT NULL DEFAULT 0, \`title\` varchar(255) NOT NULL, \`content\` varchar(255) NOT NULL, \`published\` tinyint NOT NULL DEFAULT 0, \`postId\` char(36) NULL, \`userId\` char(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`blog_nest\`.\`img_post\` (\`id\` char(36) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`isDelete\` tinyint NOT NULL DEFAULT 0, \`url\` varchar(255) NOT NULL, \`postId\` char(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`blog_nest\`.\`tag\` (\`id\` char(36) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`isDelete\` tinyint NOT NULL DEFAULT 0, \`title\` varchar(255) NOT NULL, \`content\` varchar(255) NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -42,6 +42,7 @@ export class InitialDatabase1632821069746 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE \`blog_nest\`.\`tag\``);
         await queryRunner.query(`DROP TABLE \`blog_nest\`.\`img_post\``);
         await queryRunner.query(`DROP TABLE \`blog_nest\`.\`comment\``);
+        await queryRunner.query(`DROP INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` ON \`blog_nest\`.\`user\``);
         await queryRunner.query(`DROP TABLE \`blog_nest\`.\`user\``);
     }
 

@@ -280,4 +280,20 @@ export class PostService {
   async filterPost(filterDto: FilterPostDTO): Promise<PostEntity[]> {
     return await this.postRepository.getPostByFilter(filterDto);
   }
+
+  // Create post with img
+  async createPostWithImg(
+    urlImg: string,
+    createPostDto: CreatePostDTO,
+    userId: string,
+  ): Promise<PostEntity> {
+    const user = await this.getUser(userId);
+    const img = await this.imgPostRepository.findOne({ url: urlImg });
+    const post = this.postRepository.create({
+      ...createPostDto,
+      user: user,
+      imgposts: [img],
+    });
+    return await this.postRepository.save(post);
+  }
 }

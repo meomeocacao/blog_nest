@@ -1,10 +1,12 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   Post,
   Request,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
 import { CurrentUser } from './auth/decorators/allowany.decorator';
@@ -15,6 +17,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDTO } from './users/dtos/user.dto';
 
 @Controller()
+@UseInterceptors(ClassSerializerInterceptor)
 // @UseGuards(LocalAuthGuard, RolesGuard)
 export class AppController {
   constructor(private readonly authService: AuthService) {}
@@ -22,8 +25,10 @@ export class AppController {
   // POST /login
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@CurrentUser() user: User): any {
-    return this.authService.login(user);
+  async login(@CurrentUser() user: User) {
+    const token = await this.authService.login(user);
+    this.authService.addRefreshToken(user.id, token.refresh_token);
+    return token;
   }
 
   //  GET /profile

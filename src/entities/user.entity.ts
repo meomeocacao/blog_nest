@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { Role } from 'src/auth/enums/role.enum';
 import { Column, Entity, OneToMany } from 'typeorm';
@@ -11,11 +12,12 @@ export class User extends BaseEntity {
   @Column()
   username: string;
 
-  @Column()
+  @Column({ unique: true })
   @IsEmail()
   email: string;
 
-  @Column({ select: false })
+  @Column()
+  @Exclude({ toPlainOnly: true })
   @IsNotEmpty()
   @Length(8, 12)
   password: string;
@@ -37,4 +39,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
+  @Column({ default: '' })
+  refreshToken: string;
 }

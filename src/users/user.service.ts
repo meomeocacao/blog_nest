@@ -11,6 +11,7 @@ import { Category } from 'src/entities/category.entity';
 import { Repository } from 'typeorm';
 import { hashPass } from 'src/auth/strategies/constants';
 import { CategoryDTO } from 'src/posts/dtos/category.dtos/category.dto';
+import { RefreshToken } from 'src/refresh-tokens/entities/refresh-token.entity';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,8 @@ export class UserService {
     private readonly userRepository: UserRepository,
     @InjectRepository(Category)
     private readonly cateRepository: Repository<Category>,
+    @InjectRepository(RefreshToken)
+    private readonly refreshRepository: Repository<RefreshToken>,
   ) {}
 
   //   get user by filter
@@ -91,8 +94,20 @@ export class UserService {
   async getUserByUsername(username: string): Promise<User | undefined> {
     return await this.userRepository
       .createQueryBuilder('user')
-      .addSelect('user.password')
       .where('user.username = :username', { username: username })
       .getOne();
+  }
+
+  // set current refresh token
+  // async setCurrentRefreshToken(_refreshToken: string, userId: number) {
+  //   const hashedRefreshToken = await hashPass(_refreshToken);
+  //   await this.userRepository.update(userId, {
+  //     refreshToken: hashedRefreshToken,
+  //   });
+  // }
+  //  add Refresh token to user
+  async addRefreshToken(id: string, _refreshToken: string) {
+    const hashedRefreshToken = await hashPass(_refreshToken);
+    this.userRepository.update(id, { refreshToken: hashedRefreshToken });
   }
 }
