@@ -33,6 +33,7 @@ import { TagDTO } from './dtos/tag.dtos/tag.dto';
 import { CategoryFilterDTO } from './dtos/category.dtos/category-filter.dto';
 import { CategoryDTO } from './dtos/category.dtos/category.dto';
 import { FilterPostDTO } from './dtos/post.dtos/filter-post.dto';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 export const multerOptions = {
   // Check the mimetypes to allow for upload
@@ -64,6 +65,7 @@ export const multerOptions = {
 };
 
 @Controller('post')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -93,13 +95,15 @@ export class PostController {
   }
   // POST post/create
   @Post('/create')
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @ApiBody({ type: CreatePostDTO })
   async createPost(
     @CurrentUser() user: User,
     @Body() newPost: CreatePostDTO,
   ): Promise<PostEntity> {
     console.log('Create post');
 
-    return await this.postService.createNewPost(user, newPost);
+    return await this.postService.createNewPost(user.id, newPost);
   }
 
   // PATCH soft delete post
@@ -240,6 +244,7 @@ export class PostController {
 
   //POST /post/image/:postId/
   @Post('/image/:postId')
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('photo', multerOptions))
   async uploadPostImg(
     @UploadedFile() file,
@@ -251,27 +256,49 @@ export class PostController {
     await this.postService.addImgToPost(url, postId);
     return await this.postService.getPostById(postId);
   }
-
-  // create Post
-  @Post('/upload/image/post')
+  //POST /post/image/:postId/
+  @Post('/image/upload')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        createPostDto: { type: 'CreatePostDTO' },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('photo', multerOptions))
-  async uploadPost(
-    @UploadedFile() file,
-    @CurrentUser() user: User,
-    @Body() createPostDto: CreatePostDTO,
-  ) {
-    console.log('Upload post with image');
-    const url: string = process.env.UPLOAD_LOCATION + file.filename;
-    console.log(url);
-    console.log(createPostDto);
-    console.log(user);
+  async uploadImg(@UploadedFile() file) {
+    console.log('Upload image to post');
 
-    // return await this.postService.createPostWithImg(
-    //   url,
-    //   createPostDto,
-    //   user.id,
-    // );
+    const url: string = process.env.UPLOAD_LOCATION + file.filename;
+    return url;
   }
+  // create Post
+  @Post('upload/image')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        comment: { type: 'string' },
+        outletId: { type: 'integer' },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('photo', multerOptions))
+  uploadFile2(@UploadedFile('file') file) {
+    console.log(file);
+  }
+
   // PATCH post/image/:postId
   @Patch('/image/:postId/:imgId')
   async deleteImgByPostId(

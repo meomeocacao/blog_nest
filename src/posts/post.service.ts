@@ -47,12 +47,12 @@ export class PostService {
   }
 
   // get tag by title
-  checkExistTag(tag_title: string): Promise<Tag> {
+  checkExistTag(tag_title: string): Promise<Tag | []> {
     return this.tagRepository.findOne({ title: tag_title });
   }
 
   // get tag from array
-  getArrTag(tag_title: string[]): Promise<Tag[]> {
+  getArrTag(tag_title: string[]): Promise<Tag[] | []> {
     return this.tagRepository.find({
       where: {
         title: In(tag_title),
@@ -72,10 +72,10 @@ export class PostService {
   }
   // create new Post
   async createNewPost(
-    currUser: User,
+    userId: string,
     newPost: CreatePostDTO,
   ): Promise<PostEntity | undefined> {
-    const user = await this.getUser(currUser.id);
+    const user = await this.getUser(userId);
     const tags = await this.getArrTag(newPost.tag);
     console.log(tags);
     const categories = await this.getArrCate(newPost.category);
@@ -99,7 +99,8 @@ export class PostService {
   }
 
   // get all post from user
-  async getAllPostByUser(user: User): Promise<PostEntity[]> {
+  async getAllPostByUser(_user: User): Promise<PostEntity[]> {
+    const user = await this.userRepository.findOne({ id: _user.id });
     return await this.postRepository.find({ user });
   }
   // softdelete post

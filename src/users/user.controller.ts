@@ -15,17 +15,21 @@ import { CreateUserDTO, UpdateUserDTO, UserFilterDTO } from './dtos/user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { CategoryDTO } from 'src/posts/dtos/category.dtos/category.dto';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 @Controller('user')
+@ApiBearerAuth('access-token')
 export class UserController {
   constructor(private userService: UserService) {}
 
   // GET /user
   @Get()
+  @ApiOkResponse({ description: 'List user with filter' })
   getUserByFilter(@Query() filterDto: UserFilterDTO): Promise<User[]> {
     return this.userService.getUserByFilter(filterDto);
   }
 
   @Get()
+  @ApiOkResponse({ description: 'List all Users' })
   getAllUser(): Promise<User[]> {
     return this.userService.getAllUser();
   }
